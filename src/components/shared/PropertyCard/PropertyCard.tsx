@@ -8,7 +8,7 @@ type TProperty = {
   description: string;
   price: string;
   location: string;
-  img: string;
+  img: any;
 };
 
 const PropertyCard = ({ data }: { data: TProperty }) => {
