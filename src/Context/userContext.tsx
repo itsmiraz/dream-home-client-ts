@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-
 type TUserType = {
   name: string;
   email: string;
@@ -17,31 +16,34 @@ type TUserType = {
 };
 
 type AuthContextType = {
-  currentUser: TUserType;
-  setUser: Dispatch<SetStateAction<TUserType>>;
+  currentUser: TUserType | undefined;
+  setUser: Dispatch<SetStateAction<TUserType | undefined>>;
 };
 
-export const AuthContextProvider = createContext<TUserType | undefined>(
+export const AuthContextProvider = createContext<AuthContextType | undefined>(
   undefined
 );
 
 const UserContext = ({ children }: { children: ReactNode }) => {
-  const [currentUser, setUser] = useState<TUserType | undefined>(undefined);
-
+  const [currentUser, setUser] = useState<undefined | TUserType>(undefined);
+  const userFromLocalStorage = localStorage.getItem("currentUser");
   useEffect(() => {
-    const userFromLocalStorage = localStorage.getItem("currentUser");
     if (userFromLocalStorage) {
       setUser(JSON.parse(userFromLocalStorage));
+    } else {
+      setUser(undefined);
     }
-  }, []);
 
-  const value: AuthContextType = {
+    // const token = cookies.dreamHomeAccessToken;
+  }, [userFromLocalStorage]);
+
+  const globalvalue: AuthContextType = {
     currentUser,
     setUser,
   };
 
   return (
-    <AuthContextProvider.Provider value={value}>
+    <AuthContextProvider.Provider value={globalvalue}>
       {children}
     </AuthContextProvider.Provider>
   );
