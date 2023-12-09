@@ -4,7 +4,7 @@ export const LoginValidation = z.object({
   email: z.string().email(),
   password: z
     .string()
-    .min(8, { message: "Password Should be Minimum 8 characters" }),
+    .min(6, { message: "Password Should be Minimum 6 characters" }),
 });
 
 export const RegisterValidation = z.object({
@@ -13,5 +13,5 @@ export const RegisterValidation = z.object({
   isSeller: z.boolean(),
   password: z
     .string()
-    .min(8, { message: "Password Should be Minimum 8 characters" }),
+    .min(6, { message: "Password Should be Minimum 6 characters" }),
 });

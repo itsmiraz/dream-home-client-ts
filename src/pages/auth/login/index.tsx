@@ -20,8 +20,16 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { LoginValidation } from "@/validations";
 import Head from "next/head";
+import { loginUser } from "@/services/authServices";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useCookies } from "react-cookie";
 
 const Login = () => {
+  const [cookies, setCookie] = useCookies(["dreamHomeAccessToken"]);
+
+  const router = useRouter();
+  const [Error, setError] = useState<string>("");
   // 1. Define your form.
   const form = useForm<z.infer<typeof LoginValidation>>({
     resolver: zodResolver(LoginValidation),
@@ -33,11 +41,29 @@ const Login = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof LoginValidation>) {
+  async function onSubmit(values: z.infer<typeof LoginValidation>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
-    console.log(form.formState.errors);
+
+    try {
+      const result = await loginUser(values);
+
+      if (result.status === 201) {
+        // console.log(result);
+        localStorage.setItem("currentUser", JSON.stringify(result.data.data));
+        setCookie("dreamHomeAccessToken", result.data.token);
+        router.push("/");
+        setError("");
+      }
+    } catch (err: any) {
+      if (err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Some Thing Went Wrong");
+      }
+      console.log(err);
+      // setError(err.data.message);
+    }
   }
   return (
     <>
@@ -90,6 +116,7 @@ const Login = () => {
                     </FormItem>
                   )}
                 />
+                <p className="text-red-500 text-sm">{Error && Error}</p>
 
                 <Button
                   className={buttonVariants({ size: "sm" })}

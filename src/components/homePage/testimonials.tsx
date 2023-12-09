@@ -54,7 +54,7 @@ const Testimonials = () => {
     <div className="my-20">
       <h2 className="text-center mb-6 h2-semibold">Testimonial</h2>
       <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
-        <Masonry gutter="20">
+        <Masonry gutter={"20px"}>
           {testimonials.map((testimonail, i) => (
             <TestimonialCard data={testimonail} key={i} />
           ))}

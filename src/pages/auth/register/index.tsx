@@ -22,8 +22,17 @@ import { RegisterValidation } from "@/validations";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Head from "next/head";
+import { RegisterUser } from "@/services/authServices";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { EraserIcon } from "lucide-react";
+import { useCookies } from "react-cookie";
 
 const Register = () => {
+  const router = useRouter();
+  const [Error, setError] = useState<string>("");
+  const [cookies, setCookie] = useCookies(["dreamHomeAccessToken"]);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof RegisterValidation>>({
     resolver: zodResolver(RegisterValidation),
@@ -37,11 +46,28 @@ const Register = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof RegisterValidation>) {
+  async function onSubmit(values: z.infer<typeof RegisterValidation>) {
     // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    console.log(form.formState.errors);
+
+    try {
+      const result = await RegisterUser(values);
+
+      if (result.status === 201) {
+        // console.log(result);
+        setCookie("dreamHomeAccessToken", result.data.token);
+        localStorage.setItem("currentUser", result.data.data);
+        router.push("/");
+        setError("");
+      }
+    } catch (err: any) {
+      if (err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Some Thing Went Wrong");
+      }
+      console.log(err);
+      // setError(err.data.message);
+    }
   }
   return (
     <>
@@ -50,9 +76,7 @@ const Register = () => {
       </Head>
       <Form {...form}>
         <div className=" grid grid-cols-2">
-          <div className="h-[600px] order-last rounded-r-2xl overflow-hidden">
-            <Image src={coverimg} className="w-full" alt="login-image" />
-          </div>
+          <div className="h-[600px] bg-cover bg-center bg-no-repeat order-last rounded-r-2xl overflow-hidden bg-[url('https://ideogram.ai/api/images/direct/Ou3u35E5QjuM_4gyL5wc3w.jpg')]"></div>
           <div className=" w-full rounded-l-2xl flex justify-center items-center bg-primary-2 mx-auto">
             <div className="w-1/2">
               <div>
@@ -113,7 +137,7 @@ const Register = () => {
                   <Checkbox id="terms" />
                   <Label htmlFor="terms">Register as a Seller</Label>
                 </div>
-
+                <p className="text-red-500 text-sm">{Error && Error}</p>
                 <Button
                   className={buttonVariants({ size: "sm" })}
                   type="submit"

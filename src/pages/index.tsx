@@ -1,20 +1,19 @@
 import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 import Hero from "@/components/homePage/hero";
 import Feature from "@/components/homePage/feature";
 import WhatWeDo from "@/components/homePage/whatWeDo";
 import Listings from "@/components/homePage/listings";
 import Testimonials from "@/components/homePage/testimonials";
-
-const inter = Inter({ subsets: ["latin"] });
-
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
 export default function Home() {
+  const [cookies, setCookie] = useCookies(["dreamHomeAccessToken"]);
+  const token = cookies.dreamHomeAccessToken;
+  console.log(token);
   return (
     <>
       <Head>
-        <title>Create Next App</title>
+        <title>Home - Dream Home</title>
       </Head>
 
       <main>
